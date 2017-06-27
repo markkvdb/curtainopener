@@ -57,7 +57,7 @@ def dashboard():
     global variableDict
     print(variableDict['curtain_open'])
     db = get_db()
-    cur = db.execute('select * from entries WHERE date >= ' + date_selector(0,0) + '')
+    cur = db.execute('select * from entries WHERE date > ' + date_selector(0,0) + '')
     entries = cur.fetchall()
     return render_template('dashboard.html', entries=entries, opened=variableDict['curtain_open'])
 
