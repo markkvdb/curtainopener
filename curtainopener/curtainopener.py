@@ -1,6 +1,6 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from .functions import *
-from .curtain import *
+from .variables import curtain_open
 
 import os
 import sqlite3
@@ -39,16 +39,6 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
-def get_curtain():
-    """Creates variable indicating status curtain."""
-    if not hasattr(g, 'curtain'):
-        g.curtain = Curtain(False)
-    return g.curtain
-
-def init_status_curtain(status):
-    curtain_status = get_curtain()
-    curtain_status.opened = status
-
 def init_db():
     db = get_db()
     with app.open_resource('schema.sql', mode='r') as f:
@@ -64,24 +54,22 @@ def initdb_command():
 @app.route('/')
 def dashboard():
     db = get_db()
-    curtain = get_curtain()
+    global curtain_open
     cur = db.execute('select * from entries WHERE date >= ' + date_selector(0,0) + '')
     entries = cur.fetchall()
-    return render_template('dashboard.html', entries=entries, status=curtain.opened)
+    return render_template('dashboard.html', entries=entries, opened=curtain_open)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
     hours = request.form['hours']
     minutes = request.form['minutes']
+
     if not valid_time(int(hours), int(minutes)):
         flash('Invalid time.')
-        curtain = get_curtain()
-        curtain.opened = True
         return redirect(url_for('dashboard'))
 
     db = get_db()
     properdate = date_selector(int(hours), int(minutes))
-    print(properdate)
     db.execute('insert into entries (hours, minutes, date) values (?,?,?)', [hours, minutes, properdate])
     db.commit()
     flash('New alarm was set.')

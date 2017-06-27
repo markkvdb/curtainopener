@@ -1,0 +1,1 @@
+curtain_open = False
