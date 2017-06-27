@@ -1,0 +1,3 @@
+graft curtainopener/templates
+graft curtainopener/static
+include curtainopener/schema.sql

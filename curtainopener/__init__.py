@@ -1,0 +1,1 @@
+from .curtainopener import app
