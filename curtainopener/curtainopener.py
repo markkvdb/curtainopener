@@ -55,7 +55,6 @@ def initdb_command():
 @app.route('/')
 def dashboard():
     global variableDict
-    print(variableDict['curtain_open'])
     db = get_db()
     cur = db.execute('select * from entries WHERE date > ' + date_selector(0,0) + '')
     entries = cur.fetchall()
