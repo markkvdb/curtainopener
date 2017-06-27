@@ -5,7 +5,7 @@
     <h3>Alarm is set at:</h3>
   <ul class=entries>
   {% for entry in entries %}
-    <li>{% if entry.hours is lessthan 10 %}0{% endif %}{{ entry.hours }}:{% if entry.minutes is lessthan 10 %}0{% endif %}{{ entry.minutes }} {{ entry.date }}<form action="{{ url_for('delete_entry') }}" method="POST"><input type="hidden" name="id" value="{{ entry.id }}"><input type="submit" value="X"></form>
+    <li>{% if entry.hours is lessthan 10 %}0{% endif %}{{ entry.hours }}:{% if entry.minutes is lessthan 10 %}0{% endif %}{{ entry.minutes }} {{ entry.date }} {% if entry.open %}open{% else %}close{% endif %}<form action="{{ url_for('delete_entry') }}" method="POST"><input type="hidden" name="id" value="{{ entry.id }}"><input type="submit" value="X"></form>
   {% else %}
     <li><em>Unbelievable.  No entries here so far</em>
   {% endfor %}
@@ -14,8 +14,8 @@
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
         <dt>Time:
-        <dd><input title="hours" type="number" name="hours"><input title="minutes" type="number" name="minutes">
-        <dd><input type=submit value=Share>
+        <dd><input title="hours" type="number" name="hours"><input title="minutes" type="number" name="minutes"><input type="checkbox" name="open" title="open" checked>
+        <dd><input type=submit value="Set alarm">
       </dl>
     </form>
 

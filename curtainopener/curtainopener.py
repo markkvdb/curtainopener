@@ -1,6 +1,6 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from .functions import *
-from .variables import curtain_open
+from .variables import *
 
 import os
 import sqlite3
@@ -16,6 +16,7 @@ app.config.update(dict(
     PASSWORD='default'
 ))
 app.config.from_envvar('CURTAIN_OPENER_SETTINGS', silent=True)
+
 
 ###################
 
@@ -53,25 +54,32 @@ def initdb_command():
 
 @app.route('/')
 def dashboard():
+    global variableDict
+    print(variableDict['curtain_open'])
     db = get_db()
-    global curtain_open
     cur = db.execute('select * from entries WHERE date >= ' + date_selector(0,0) + '')
     entries = cur.fetchall()
-    return render_template('dashboard.html', entries=entries, opened=curtain_open)
+    return render_template('dashboard.html', entries=entries, opened=variableDict['curtain_open'])
 
 @app.route('/add', methods=['POST'])
 def add_entry():
     hours = request.form['hours']
     minutes = request.form['minutes']
+    open = False
 
     if not valid_time(int(hours), int(minutes)):
         flash('Invalid time.')
         return redirect(url_for('dashboard'))
 
+    if 'open' in request.form:
+        open = True
+
     db = get_db()
     properdate = date_selector(int(hours), int(minutes))
-    db.execute('insert into entries (hours, minutes, date) values (?,?,?)', [hours, minutes, properdate])
+    db.execute('insert into entries (hours, minutes, date, open) values (?,?,?,?)', [hours, minutes, properdate,
+                                                                                     open])
     db.commit()
+    curtain_job_controller_add(int(hours), int(minutes), open)
     flash('New alarm was set.')
     return redirect(url_for('dashboard'))
 
@@ -84,4 +92,5 @@ def delete_entry():
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
+    init()
     app.run()
