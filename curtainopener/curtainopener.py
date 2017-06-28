@@ -63,7 +63,7 @@ def dashboard():
     global variableDict
     db = get_db()
     time_now = datetime.now()
-    cur = db.execute('select * from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + '')
+    cur = db.execute('select * from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + ' AND done = 0')
     entries = cur.fetchall()
     return render_template('dashboard.html', entries=entries, opened=variableDict['curtain_open'])
 
@@ -83,10 +83,12 @@ def add_entry():
 
     alarm = Alarm(hours, minutes, open)
     db = get_db()
+    cursor = db.cursor()
     proper_date = alarm.date_to_str()
-    db.execute('insert into entries (hours, minutes, date, open) values (?,?,?,?)', [alarm.hours, alarm.minutes,
+    cursor.execute('insert into entries (hours, minutes, date, open) values (?,?,?,?)', [alarm.hours, alarm.minutes,
                                                                                      proper_date, alarm.open])
     db.commit()
+    alarm.set_id(cursor.lastrowid)
     curtain_job_controller_add(alarm)
     flash('New alarm was set.')
 
@@ -96,8 +98,9 @@ def add_entry():
 @app.route('/delete', methods=['POST'])
 def delete_entry():
     db = get_db()
+    cursor = get_db().cursor()
     id = int(request.form['id'])
-    db.execute('delete from entries where id=?', (id,))
+    cursor.execute('update entries set done = 1 where id=?', (id,))
     db.commit()
     return redirect(url_for('dashboard'))
 

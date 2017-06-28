@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from .variables import variableDict
 from .alarm import Alarm
+from .curtainopener import *
 
 
 def valid_time(hours, minutes) -> bool:
@@ -23,17 +24,21 @@ def curtain_job_controller_add(alarm):
     variableDict['event'].set()
 
 
-def curtain_job(to_open):
+def curtain_job(alarm):
     global variableDict
 
     # TODO create stepper controller
-    if to_open:
+    if alarm.open:
         pass
     else:
         pass
 
-    print("JOB EXECUTED!!!")
-    variableDict['curtain_open'] = not variableDict['curtain_open']
+    # TODO select database
+    # db = None
+    # db.execute('update entries set done = 1 where id=?', (alarm.id,))
+    # db.commit()
+    # variableDict['curtain_open'] = not variableDict['curtain_open']
+
 
 
 def job_worker():
@@ -56,4 +61,4 @@ def job_worker():
 
         # Execute job
         time, alarm = variableDict['job_queue'].get()
-        curtain_job(alarm.open)
+        curtain_job(alarm)

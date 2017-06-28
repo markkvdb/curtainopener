@@ -4,10 +4,14 @@ from datetime import datetime, timedelta
 class Alarm(object):
 
     def __init__(self, hours, minutes, open):
+        self.id = -1
         self.hours = int(hours)
         self.minutes = int(minutes)
         self.open = open
         self.date = self.date_selector()
+
+    def set_id(self, id):
+        self.id = id
 
     def date_selector(self):
         """Checks if alarm must be set for today or tomorrow."""
