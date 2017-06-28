@@ -7,7 +7,7 @@
   {% for entry in entries %}
     <li>{% if entry.hours is lessthan 10 %}0{% endif %}{{ entry.hours }}:{% if entry.minutes is lessthan 10 %}0{% endif %}{{ entry.minutes }} {{ entry.date }} {% if entry.open %}open{% else %}close{% endif %}<form action="{{ url_for('delete_entry') }}" method="POST"><input type="hidden" name="id" value="{{ entry.id }}"><input type="submit" value="X"></form>
   {% else %}
-    <li><em>Unbelievable.  No entries here so far</em>
+    <li><em>Unbelievable.  No entries here so far.</em>
   {% endfor %}
   </ul>
 

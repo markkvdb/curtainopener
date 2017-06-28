@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 class Alarm(object):
 
     def __init__(self, hours, minutes, open):
-        self.hours = hours
-        self.minutes = minutes
+        self.hours = int(hours)
+        self.minutes = int(minutes)
         self.open = open
         self.date = self.date_selector()
 

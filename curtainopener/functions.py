@@ -40,22 +40,20 @@ def job_worker():
     global variableDict
 
     while True:
+        variableDict['event'].clear()
+
         # Wait for next job
         if variableDict['job_queue'].empty():
             variableDict['event'].wait()
-        else:
-            # TODO set time untill job correctly
-            seconds_till_next_job = variableDict['job_queue'].queue[0][0]
+            variableDict['event'].clear()
 
-            if seconds_till_next_job < 0:
-                continue
-            else:
-                variableDict['event'].wait(seconds_till_next_job)
+        # TODO set time untill job correctly
+        seconds_till_next_job = 2
+
+        while seconds_till_next_job > 0:
+            variableDict['event'].wait(seconds_till_next_job)
+            seconds_till_next_job = 0
 
         # Execute job
         time, alarm = variableDict['job_queue'].get()
         curtain_job(alarm.open)
-
-        # Set event back to False if queue is empty
-        if variableDict['job_queue'].empty():
-            variableDict['event'].clear()

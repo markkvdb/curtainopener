@@ -1,4 +1,4 @@
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import Flask, request, g, redirect, url_for, render_template, flash
 from .functions import *
 from datetime import datetime
 from .variables import *
@@ -63,7 +63,7 @@ def dashboard():
     global variableDict
     db = get_db()
     time_now = datetime.now()
-    cur = db.execute('select * from entries WHERE date > ' + time_now.strftime("%Y-%m-%d") + '')
+    cur = db.execute('select * from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + '')
     entries = cur.fetchall()
     return render_template('dashboard.html', entries=entries, opened=variableDict['curtain_open'])
 
@@ -102,7 +102,11 @@ def delete_entry():
     return redirect(url_for('dashboard'))
 
 
-if __name__ == '__main__':
-    t = threading.Thread(target=job_worker())
+@app.before_first_request
+def start_job_thread():
+    t = threading.Thread(target=job_worker, daemon=True)
     t.start()
-    app.run()
+
+
+if __name__ == '__main__':
+    app.run(use_reloader=False)
