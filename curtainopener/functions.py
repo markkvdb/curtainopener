@@ -33,7 +33,6 @@ def curtain_job(alarm):
     else:
         pass
 
-    # TODO select database
     with app.app_context():
         db = get_db1(current_app)
         db.execute('update entries set done = 1 where id=?', (alarm.id,))
@@ -54,12 +53,14 @@ def job_worker():
             variableDict['event'].wait()
             variableDict['event'].clear()
 
-        # TODO set time untill job correctly
-        seconds_till_next_job = 2
-
-        while seconds_till_next_job > 0:
-            variableDict['event'].wait(seconds_till_next_job)
-            seconds_till_next_job = 0
+        # TODO broken logic. Must look at total seconds. Otherwise other entries are not updated.
+        # while True:
+        #     time, alarm = variableDict['job_queue'].queue[0]
+        #     seconds_until_next_job = alarm.time_in_seconds()
+        #     if seconds_until_next_job < 0:
+        #         break
+        #
+        #     variableDict['event'].wait(seconds_until_next_job)
 
         # Execute job
         time, alarm = variableDict['job_queue'].get()

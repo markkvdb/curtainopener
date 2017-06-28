@@ -28,19 +28,7 @@ class Alarm(object):
     def date_to_str(self) -> str:
         return self.date.strftime("%Y-%m-%d")
 
-    def seconds_till_execute(self) -> int:
-        """Calculate number of seconds till the job has to be started"""
-        timenow = datetime.now()
-        if self.hours > timenow.hour.real:
-            seconds = (self.hours - timenow.hour.real) * 3600 + (self.minutes - timenow.minute.real) * 60
-        else:
-            if self.minutes > timenow.minute.real and self.hours == timenow.hour.real:
-                seconds = (self.minutes - timenow.minute.real) * 60
-            else:
-                seconds = (24 - timenow.hour.real + self.hours) * 3600 + (self.minutes - timenow.minute.real) * 60
 
-        return seconds
-
-    # TODO give time in seconds for the queue
-    def time_in_seconds(self):
-        pass
+    def time_in_seconds(self) -> int:
+        timedelta_alarm = self.date - datetime.now()
+        return timedelta_alarm.total_seconds()
