@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from .variables import variableDict
 from .alarm import Alarm
-from .curtainopener import *
+from .database_handler import *
 
 
 def valid_time(hours, minutes) -> bool:
@@ -34,11 +34,13 @@ def curtain_job(alarm):
         pass
 
     # TODO select database
-    # db = None
-    # db.execute('update entries set done = 1 where id=?', (alarm.id,))
-    # db.commit()
-    # variableDict['curtain_open'] = not variableDict['curtain_open']
+    with app.app_context():
+        db = get_db1(current_app)
+        db.execute('update entries set done = 1 where id=?', (alarm.id,))
+        db.commit()
 
+    print('JOB DONE!!!')
+    variableDict['curtain_open'] = not variableDict['curtain_open']
 
 
 def job_worker():
