@@ -1,17 +1,7 @@
 from datetime import datetime, timedelta
 from .variables import variableDict
+from .alarm import Alarm
 
-def date_selector(hours, minutes) -> str:
-    """Checks if alarm must be set for today or tomorrow."""
-    timenow = datetime.now()
-    if hours > timenow.hour.real:
-        return timenow.strftime("%Y-%m-%d")
-    else:
-        if minutes > timenow.minute.real and hours == timenow.hour.real:
-            return timenow.strftime("%Y-%m-%d")
-        else:
-            timenow += timedelta(days=1)
-            return timenow.strftime("%Y-%m-%d")
 
 def valid_time(hours, minutes) -> bool:
     """Check if the selected time is valid, e.g. between 00:00 and 23:59."""
@@ -21,31 +11,21 @@ def valid_time(hours, minutes) -> bool:
 
     return False
 
-def seconds_till_execute(hours, minutes) -> int:
-    """Calculate number of seconds till the job has to be started"""
-    timenow = datetime.now()
-    if hours > timenow.hour.real:
-        seconds = (hours - timenow.hour.real) * 3600 + (minutes - timenow.minute.real) * 60
-    else:
-        if minutes > timenow.minute.real and hours == timenow.hour.real:
-            seconds = (minutes - timenow.minute.real) * 60
-        else:
-            seconds = (24 - timenow.hour.real + hours) * 3600 + (minutes - timenow.minute.real) * 60
 
-    return seconds
-
-def curtain_job_controller_add(hours, minutes, open):
+def curtain_job_controller_add(alarm):
     global variableDict
-    if variableDict['curtain_open'] == open:
+    if variableDict['curtain_open'] == alarm.open:
         return
 
-    seconds = seconds_till_execute(hours, minutes)
+    seconds = alarm.seconds_till_execute()
 
-    variableDict['job_scheduler'].enter(2, 1, curtain_job, argument=(open,))
-    variableDict['job_scheduler'].run()
+    variableDict['job_queue'].put((seconds, alarm))
+    variableDict['event'].set()
+
 
 def curtain_job(to_open):
     global variableDict
+
     # TODO create stepper controller
     if to_open:
         pass
@@ -54,3 +34,28 @@ def curtain_job(to_open):
 
     print("JOB EXECUTED!!!")
     variableDict['curtain_open'] = not variableDict['curtain_open']
+
+
+def job_worker():
+    global variableDict
+
+    while True:
+        # Wait for next job
+        if variableDict['job_queue'].empty():
+            variableDict['event'].wait()
+        else:
+            # TODO set time untill job correctly
+            seconds_till_next_job = variableDict['job_queue'].queue[0][0]
+
+            if seconds_till_next_job < 0:
+                continue
+            else:
+                variableDict['event'].wait(seconds_till_next_job)
+
+        # Execute job
+        time, alarm = variableDict['job_queue'].get()
+        curtain_job(alarm.open)
+
+        # Set event back to False if queue is empty
+        if variableDict['job_queue'].empty():
+            variableDict['event'].clear()

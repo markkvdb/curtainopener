@@ -1,5 +1,6 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from .functions import *
+from datetime import datetime
 from .variables import *
 
 import os
@@ -17,14 +18,15 @@ app.config.update(dict(
 ))
 app.config.from_envvar('CURTAIN_OPENER_SETTINGS', silent=True)
 
-
 ###################
+
 
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
     rv.row_factory = sqlite3.Row
     return rv
+
 
 def get_db():
     """Opens a new database connection if there is none yet for the
@@ -34,11 +36,13 @@ def get_db():
         g.sqlite_db = connect_db()
     return g.sqlite_db
 
+
 @app.teardown_appcontext
 def close_db(error):
     """Closes the database again at the end of the request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
+
 
 def init_db():
     db = get_db()
@@ -46,19 +50,23 @@ def init_db():
         db.cursor().executescript(f.read())
     db.commit()
 
+
 @app.cli.command('initdb')
 def initdb_command():
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
 
+
 @app.route('/')
 def dashboard():
     global variableDict
     db = get_db()
-    cur = db.execute('select * from entries WHERE date > ' + date_selector(0,0) + '')
+    time_now = datetime.now()
+    cur = db.execute('select * from entries WHERE date > ' + time_now.strftime("%Y-%m-%d") + '')
     entries = cur.fetchall()
     return render_template('dashboard.html', entries=entries, opened=variableDict['curtain_open'])
+
 
 @app.route('/add', methods=['POST'])
 def add_entry():
@@ -73,14 +81,17 @@ def add_entry():
     if 'open' in request.form:
         open = True
 
+    alarm = Alarm(hours, minutes, open)
     db = get_db()
-    properdate = date_selector(int(hours), int(minutes))
-    db.execute('insert into entries (hours, minutes, date, open) values (?,?,?,?)', [hours, minutes, properdate,
-                                                                                     open])
+    proper_date = alarm.date_to_str()
+    db.execute('insert into entries (hours, minutes, date, open) values (?,?,?,?)', [alarm.hours, alarm.minutes,
+                                                                                     proper_date, alarm.open])
     db.commit()
-    curtain_job_controller_add(int(hours), int(minutes), open)
+    curtain_job_controller_add(alarm)
     flash('New alarm was set.')
+
     return redirect(url_for('dashboard'))
+
 
 @app.route('/delete', methods=['POST'])
 def delete_entry():
@@ -90,6 +101,8 @@ def delete_entry():
     db.commit()
     return redirect(url_for('dashboard'))
 
+
 if __name__ == '__main__':
-    init()
+    t = threading.Thread(target=job_worker())
+    t.start()
     app.run()
