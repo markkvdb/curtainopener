@@ -22,11 +22,12 @@ class Alarm(object):
             else:
                 time_now += timedelta(days=1)
 
-        time_now.replace(hour=self.hours, minute=self.minutes, second=0)
-        return time_now
+        time_now1 = time_now.replace(hour=self.hours, minute=self.minutes, second=0)
+
+        return time_now1
 
     def date_to_str(self) -> str:
-        return self.date.strftime("%Y-%m-%d")
+        return self.date.strftime("%Y-%m-%d %H:%M:%S")
 
 
     def time_in_seconds(self) -> int:

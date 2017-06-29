@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from .variables import variableDict
 from .alarm import Alarm
+from .stepcontroller import motor_controller
 from .database_handler import *
 
 
@@ -15,10 +16,8 @@ def valid_time(hours, minutes) -> bool:
 
 def curtain_job_controller_add(alarm):
     global variableDict
-    if variableDict['curtain_open'] == alarm.open:
-        return
 
-    seconds = alarm.seconds_till_execute()
+    seconds = alarm.date.timestamp()
 
     variableDict['job_queue'].put((seconds, alarm))
     variableDict['event'].set()
@@ -27,18 +26,16 @@ def curtain_job_controller_add(alarm):
 def curtain_job(alarm):
     global variableDict
 
-    # TODO create stepper controller
-    if alarm.open:
-        pass
-    else:
-        pass
+    if variableDict['curtain_open'] == alarm.open:
+        return
+
+    motor_controller(alarm.open)
 
     with app.app_context():
         db = get_db1(current_app)
         db.execute('update entries set done = 1 where id=?', (alarm.id,))
         db.commit()
 
-    print('JOB DONE!!!')
     variableDict['curtain_open'] = not variableDict['curtain_open']
 
 
@@ -53,14 +50,14 @@ def job_worker():
             variableDict['event'].wait()
             variableDict['event'].clear()
 
-        # TODO broken logic. Must look at total seconds. Otherwise other entries are not updated.
-        # while True:
-        #     time, alarm = variableDict['job_queue'].queue[0]
-        #     seconds_until_next_job = alarm.time_in_seconds()
-        #     if seconds_until_next_job < 0:
-        #         break
-        #
-        #     variableDict['event'].wait(seconds_until_next_job)
+        while True:
+            time, alarm = variableDict['job_queue'].queue[0]
+            seconds_until_next_job = alarm.time_in_seconds()
+
+            if seconds_until_next_job < 0:
+                break
+
+            variableDict['event'].wait(seconds_until_next_job)
 
         # Execute job
         time, alarm = variableDict['job_queue'].get()
