@@ -11,7 +11,7 @@ def dashboard():
     global variableDict
     db = get_db()
     time_now = datetime.now()
-    cur = db.execute('select * from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + ' AND done = 0')
+    cur = db.execute('select * from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + ' AND done = 0 ORDER BY date, hours, minutes')
     entries = cur.fetchall()
     return render_template('dashboard.html', entries=entries, opened=variableDict['curtain_open'])
 
