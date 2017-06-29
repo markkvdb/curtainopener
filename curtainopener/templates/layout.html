@@ -1,31 +1,40 @@
 <!doctype html>
+<html class="no-js" lang="en" dir="ltr">
 <head>
     <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}{% endblock %} | Curtain Opener</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='app.css') }}">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='foundation.min.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='app.css') }}">
 </head>
 <body>
-    <div class="row">
-        <h1>Curtain Opener</h1>
+<div class="grid-container">
+    <div class="grid-x grid-padding-x">
+        <div class="large-12 cell">
+            <h1>Curtain Opener</h1>
+        </div>
     </div>
-    <div class="row">
-        <div class="small-4 column">
+
+    <div class="grid-x grid-padding-x">
+        <div class="large-4 cell">
             {% block sidebar %}
             {% endblock %}
         </div>
-        <div class="small-8 column">
+        <div class="large-8 cell">
             {% for message in get_flashed_messages() %}
-            <div class=flash>{{ message }}</div>
+            <div class="callout secondary">{{ message }}</div>
             {% endfor %}
 
             {% block body %}{% endblock %}
         </div>
     </div>
+</div>
 
     <script src="{{ url_for('static', filename='vendor/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/what-input.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/foundation.js') }}"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
+</html>
 

@@ -3,39 +3,33 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block sidebar %}
-    <h6>Current status:</h6>
-    Curtain is {% if opened %}open{% else %}closed{% endif %}
+    <h5>Current status:</h5>
+    <img height="300" width="300" src="{{ url_for('static', filename='images/') }}{% if opened %}open{% else %}closed{% endif %}.jpg">
 {% endblock %}
 
 {% block body %}
-    <h6>Alarm is set at:</h6>
-    <ul class="no-bullet">
+    <h5>Alarms:</h5>
   {% for entry in entries %}
-    <li>{% if entry.hours is lessthan 10 %}0{% endif %}{{ entry.hours }}:{% if entry.minutes is lessthan 10 %}0{% endif %}{{ entry.minutes }} {{ entry.date }} {% if entry.open %}open{% else %}close{% endif %}<form action="{{ url_for('delete_entry') }}" method="POST"><input type="hidden" name="id" value="{{ entry.id }}"><input type="submit" value="X"></form>
+      <div class="callout secondary">
+          <h5>{% if entry.hours is lessthan 10 %}0{% endif %}{{ entry.hours }}:{% if entry.minutes is lessthan 10 %}0{% endif %}{{ entry.minutes }} <small>{% if entry.open %}open{% else %}close{% endif %}</small></h5>
+          <form action="{{ url_for('delete_entry') }}" method="POST"><input type="hidden" name="id" value="{{ entry.id }}"><input type="submit" class="button" value="Delete"></form></p>
+      </div>
   {% else %}
-    <li><em>Unbelievable.  No entries here so far.</em>
+    <div class="callout secondary">
+    <p>No alarms so far.</p>
+    </div>
   {% endfor %}
-  </ul>
-
+    <br>
+    <h5>Add new alarm:</h5>
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-      <div class="row">
-          <div class="medium-4 column">
-              <label>Hours
-                  <input title="hours" type="number" name="hours">
-              </label>
-          </div>
-          <div class="medium-4 column">
-              <label>Minutes
-                  <input title="minutes" type="number" name="minutes">
-              </label>
-          </div>
-          <div class="medium-4 column">
-              <label>Open
-                  <input type="checkbox" name="open" title="open" checked>
-              </label>
+      <div class="input-group">
+          <input class="input-group-field" title="hours" type="number" name="hours" min="0" max="23" placeholder="hours">
+          <input class="input-group-field" title="minutes" type="number" name="minutes" min="0" max="59" placeholder="minutes">
+          <input class="input-group-field" type="checkbox" name="open" title="open" checked>
+          <div class="input-group-button">
+            <input type="submit" class="button" value="Set alarm">
           </div>
       </div>
-        <input type=submit value="Set alarm">
     </form>
 
 {% endblock %}
