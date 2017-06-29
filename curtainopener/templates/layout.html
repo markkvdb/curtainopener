@@ -1,10 +1,31 @@
 <!doctype html>
-<title>Curtain Opener</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div class=page>
-  <h1>Curtain Opener Dashboard</h1>
-  {% for message in get_flashed_messages() %}
-    <div class=flash>{{ message }}</div>
-  {% endfor %}
-  {% block body %}{% endblock %}
-</div>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}{% endblock %} | Curtain Opener</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='app.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='foundation.min.css') }}">
+</head>
+<body>
+    <div class="row">
+        <h1>Curtain Opener</h1>
+    </div>
+    <div class="row">
+        <div class="small-4 column">
+            {% block sidebar %}
+            {% endblock %}
+        </div>
+        <div class="small-8 column">
+            {% for message in get_flashed_messages() %}
+            <div class=flash>{{ message }}</div>
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='vendor/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/foundation.js') }}"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
