@@ -1,22 +1,35 @@
 {% extends "layout.html" %}
-{% block body %}
-    <h3>Current status:</h3>
-    Curtain is {% if status %}open{% else %}closed{% endif %}
-    <h3>Alarm is set at:</h3>
-  <ul class=entries>
-  {% for entry in entries %}
-    <li>{% if entry.hours is lessthan 10 %}0{% endif %}{{ entry.hours }}:{% if entry.minutes is lessthan 10 %}0{% endif %}{{ entry.minutes }} {{ entry.date }}<form action="{{ url_for('delete_entry') }}" method="POST"><input type="hidden" name="id" value="{{ entry.id }}"><input type="submit" value="X"></form>
-  {% else %}
-    <li><em>Unbelievable.  No entries here so far</em>
-  {% endfor %}
-  </ul>
 
+{% block title %}Dashboard{% endblock %}
+
+{% block sidebar %}
+    <h5>Current status:</h5>
+    <img height="300" width="300" src="{{ url_for('static', filename='images/') }}{% if opened %}open{% else %}closed{% endif %}.jpg">
+{% endblock %}
+
+{% block body %}
+    <h5>Alarms:</h5>
+  {% for entry in entries %}
+      <div class="callout secondary">
+          <h5>{% if entry.hours is lessthan 10 %}0{% endif %}{{ entry.hours }}:{% if entry.minutes is lessthan 10 %}0{% endif %}{{ entry.minutes }} <small>{% if entry.open %}open{% else %}close{% endif %}</small></h5>
+          <form action="{{ url_for('delete_entry') }}" method="POST"><input type="hidden" name="id" value="{{ entry.id }}"><input type="submit" class="button" value="Delete"></form></p>
+      </div>
+  {% else %}
+    <div class="callout secondary">
+    <p>No alarms so far.</p>
+    </div>
+  {% endfor %}
+    <hr>
+    <h5>Add new alarm:</h5>
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-      <dl>
-        <dt>Time:
-        <dd><input title="hours" type="number" name="hours"><input title="minutes" type="number" name="minutes">
-        <dd><input type=submit value=Share>
-      </dl>
+      <div class="input-group">
+          <input class="input-group-field" title="hours" type="number" name="hours" min="0" max="23" placeholder="hours">
+          <input class="input-group-field" title="minutes" type="number" name="minutes" min="0" max="59" placeholder="minutes">
+          <input class="input-group-field" type="checkbox" name="open" title="open" checked>
+          <div class="input-group-button">
+            <input type="submit" class="button" value="Set alarm">
+          </div>
+      </div>
     </form>
 
 {% endblock %}
