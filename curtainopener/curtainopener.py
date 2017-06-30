@@ -1,9 +1,8 @@
 from flask import request, redirect, url_for, render_template, flash
-from curtainopener import app
-from .functions import *
+from curtainopener.functions import *
 from datetime import datetime
-from .variables import *
-from .database_handler import *
+from curtainopener.variables import *
+from curtainopener.database_handler import *
 
 
 @app.route('/')
