@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta
-from .variables import variableDict
-from .alarm import Alarm
 from .stepcontroller import motor_controller
 from .database_handler import *
+from .alarm import Alarm
+from .variables import variableDict
 
 
 def valid_time(hours, minutes) -> bool:

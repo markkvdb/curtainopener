@@ -1,5 +1,5 @@
 from curtainopener import app
-from flask import g, current_app
+from flask import g
 import sqlite3
 
 ###################
