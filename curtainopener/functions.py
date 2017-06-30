@@ -1,3 +1,4 @@
+from flask import current_app
 from .stepcontroller import motor_controller
 from .database_handler import *
 from .alarm import Alarm
