@@ -53,6 +53,25 @@ def delete_entry():
     return redirect(url_for('dashboard'))
 
 
+@app.route('/settings')
+def settings():
+    db = get_db()
+    cursor = db.cursor()
+    cur = cursor.execute('select value from settings WHERE id=1')
+    value = cur.fetchone()
+    return render_template('settings.html', time_value=value)
+
+
+@app.route('/change_settings', methods=['POST'])
+def change_settings():
+    time_value = int(request.form['time_before_start'])
+    time_value *= 60
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('update settings set value = ? where id=1', (time_value,))
+    db.commit()
+    return redirect(url_for('settings'))
+
 @app.before_first_request
 def start_job_thread():
     t = threading.Thread(target=job_worker, daemon=True)
