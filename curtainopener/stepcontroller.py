@@ -20,7 +20,7 @@ def motor_controller(alarm):
 
     try:
         for time in range(0, number_of_steps):
-            p = GPIO.PWM(17, 100)
+            p = GPIO.PWM(17, alarm.speed)
             GPIO.output(22, True)
             p.start(0.1)
             sleep(motor_time_per_step)

@@ -30,9 +30,10 @@ def add_entry():
         open = True
 
     db = get_db()
-    cur = db.cursor().execute('select value from settings WHERE id=1')
-    seconds_till_start = cur.fetchone()[0] * 60
-    alarm = Alarm(hours, minutes, open, seconds_till_start)
+    cur = db.cursor().execute('select value from settings')
+    seconds_till_start = cur.fetchall()[0] * 60
+    speed = cur.fetchall()[1]
+    alarm = Alarm(hours, minutes, open, seconds_till_start, speed)
     cursor = db.cursor()
     proper_date = alarm.date_to_str()
     cursor.execute('insert into entries (hours, minutes, date, open) values (?,?,?,?)', [alarm.hours, alarm.minutes,
@@ -59,19 +60,23 @@ def delete_entry():
 def settings():
     db = get_db()
     cursor = db.cursor()
-    cur = cursor.execute('select value from settings WHERE id=1')
-    value = cur.fetchone()[0]
-    return render_template('settings.html', time_value=value)
+    cur = cursor.execute('select value from settings')
+    time_value = cur.fetchall()[0]
+    speed_value = cur.fetchall()[1]
+    return render_template('settings.html', time_value=time_value, speed_value=speed_value)
 
 
 @app.route('/change_settings', methods=['POST'])
 def change_settings():
     time_value = int(request.form['time_before_start'])
+    speed_value = int(request.form['speed'])
     db = get_db()
     cursor = db.cursor()
     cursor.execute('update settings set value = ? where id=1', (time_value,))
+    cursor.execute('update settings set value = ? where id=2', (speed_value,))
     db.commit()
     return redirect(url_for('settings'))
+
 
 @app.before_first_request
 def start_job_thread():
