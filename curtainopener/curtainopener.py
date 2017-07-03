@@ -82,6 +82,27 @@ def change_settings():
 
 @app.before_first_request
 def start_job_thread():
+    time_now = datetime.now()
+    # Add old alarms to job queue
+    db = get_db()
+    cursor = db.cursor()
+    cur = cursor.execute('select value from settings')
+    entries = cur.fetchall()
+    time_value = entries[0][0]
+    speed_value = entries[1][0]
+
+    cur = cursor.execute('select id, hours, minutes, open from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + ' AND done = 0 ORDER BY date, hours, minutes')
+
+    for entry in cur.fetchall():
+        hours = entry[1]
+        minutes = entry[2]
+        to_open = entry[3]
+        alarm = Alarm(hours, minutes, to_open, time_value, speed_value)
+        alarm.set_id(entry[0])
+
+        curtain_job_controller_add(alarm)
+
+    # Start worker thread
     t = threading.Thread(target=job_worker, daemon=True)
     t.start()
 
