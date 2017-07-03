@@ -6,7 +6,7 @@
     <h5>Change settings</h5>
     <form action="{{ url_for('change_settings') }}" method=post>
         <label>Time before start alarm (in minutes)
-            <input type="number" name="time_before_start" value="{{ value_time }}">
+            <input type="number" name="time_before_start" value="{{ time_value }}">
         </label>
         <input type="submit" class="button" value="Save">
     </form>

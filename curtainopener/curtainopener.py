@@ -58,14 +58,13 @@ def settings():
     db = get_db()
     cursor = db.cursor()
     cur = cursor.execute('select value from settings WHERE id=1')
-    value = cur.fetchone()
+    value = cur.fetchone()[0]
     return render_template('settings.html', time_value=value)
 
 
 @app.route('/change_settings', methods=['POST'])
 def change_settings():
     time_value = int(request.form['time_before_start'])
-    time_value *= 60
     db = get_db()
     cursor = db.cursor()
     cursor.execute('update settings set value = ? where id=1', (time_value,))
