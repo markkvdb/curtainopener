@@ -31,8 +31,9 @@ def add_entry():
 
     db = get_db()
     cur = db.cursor().execute('select value from settings')
-    seconds_till_start = cur.fetchall()[0] * 60
-    speed = cur.fetchall()[1]
+    entries = cur.fetchall()
+    seconds_till_start = entries[0][0] * 60
+    speed = entries[1][0]
     alarm = Alarm(hours, minutes, open, seconds_till_start, speed)
     cursor = db.cursor()
     proper_date = alarm.date_to_str()
@@ -61,8 +62,9 @@ def settings():
     db = get_db()
     cursor = db.cursor()
     cur = cursor.execute('select value from settings')
-    time_value = cur.fetchall()[0]
-    speed_value = cur.fetchall()[1]
+    entries = cur.fetchall()
+    time_value = entries[0][0]
+    speed_value = entries[1][0]
     return render_template('settings.html', time_value=time_value, speed_value=speed_value)
 
 
