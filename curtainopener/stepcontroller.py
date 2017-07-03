@@ -13,9 +13,8 @@ def motor_controller(to_open):
     try:
         sleep(100)
     except KeyboardInterrupt:
+        print('Motor is interrupted.')
         pass
 
     p.stop()
     GPIO.cleanup()
-
-
