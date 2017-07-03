@@ -29,7 +29,7 @@ def curtain_job(alarm):
     if variableDict['curtain_open'] == alarm.open:
         return
 
-    motor_controller(alarm.open)
+    motor_controller(alarm)
 
     with app.app_context():
         db = get_db1(current_app)

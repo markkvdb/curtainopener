@@ -29,8 +29,10 @@ def add_entry():
     if 'open' in request.form:
         open = True
 
-    alarm = Alarm(hours, minutes, open)
     db = get_db()
+    cur = db.cursor().execute('select value from settings WHERE id=1')
+    seconds_till_start = cur.fetchone()[0] * 60
+    alarm = Alarm(hours, minutes, open, seconds_till_start)
     cursor = db.cursor()
     proper_date = alarm.date_to_str()
     cursor.execute('insert into entries (hours, minutes, date, open) values (?,?,?,?)', [alarm.hours, alarm.minutes,

@@ -3,11 +3,13 @@ from datetime import datetime, timedelta
 
 class Alarm(object):
 
-    def __init__(self, hours, minutes, open):
+    def __init__(self, hours, minutes, open, seconds_to_last):
         self.id = -1
         self.hours = int(hours)
         self.minutes = int(minutes)
         self.open = open
+        self.seconds_to_last = seconds_to_last
+
         self.date = self.date_selector()
 
     def set_id(self, id):
@@ -23,6 +25,7 @@ class Alarm(object):
                 time_now += timedelta(days=1)
 
         time_now1 = time_now.replace(hour=self.hours, minute=self.minutes, second=0)
+        time_now1 -= timedelta(seconds=self.seconds_to_last)
 
         return time_now1
 
