@@ -6,7 +6,7 @@ from .alarm import Alarm
 
 def motor_controller(alarm):
     number_of_steps = 10
-    duration_motor = 60
+    duration_motor = 50 * (100 / alarm.speed)
 
     total_time_per_step = int(alarm.seconds_to_last / number_of_steps)
     motor_time_per_step = int(duration_motor / number_of_steps)
