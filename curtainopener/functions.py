@@ -61,4 +61,11 @@ def job_worker():
 
         # Execute job
         time, alarm = variableDict['job_queue'].get()
-        curtain_job(alarm)
+
+        with app.app_context():
+            db = get_db()
+            cur = db.cursor().execute('select done from entries where id=?', (alarm.id,))
+            entry = cur.fetchone()[0]
+
+        if entry == 0:
+            curtain_job(alarm)

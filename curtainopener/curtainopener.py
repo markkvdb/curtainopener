@@ -11,7 +11,8 @@ def dashboard():
     global variableDict
     db = get_db()
     time_now = datetime.now()
-    cur = db.execute('select * from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + ' AND done = 0 ORDER BY date, hours, minutes')
+    cur = db.execute('select * from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d")
+                     + ' AND done = 0 ORDER BY date, hours, minutes')
     entries = cur.fetchall()
     return render_template('dashboard.html', entries=entries, opened=variableDict['curtain_open'])
 
@@ -59,13 +60,15 @@ def delete_entry():
 
 @app.route('/settings')
 def settings():
+    global variableDict
     db = get_db()
     cursor = db.cursor()
     cur = cursor.execute('select value from settings')
     entries = cur.fetchall()
     time_value = entries[0][0]
     speed_value = entries[1][0]
-    return render_template('settings.html', time_value=time_value, speed_value=speed_value)
+    return render_template('settings.html', opened=variableDict['curtain_open'],
+                           time_value=time_value, speed_value=speed_value)
 
 
 @app.route('/change_settings', methods=['POST'])
@@ -88,10 +91,11 @@ def start_job_thread():
     cursor = db.cursor()
     cur = cursor.execute('select value from settings')
     entries = cur.fetchall()
-    time_value = entries[0][0]
+    time_value = entries[0][0] * 60
     speed_value = entries[1][0]
 
-    cur = cursor.execute('select id, hours, minutes, open from entries WHERE date >= ' + time_now.strftime("%Y-%m-%d") + ' AND done = 0 ORDER BY date, hours, minutes')
+    cur = cursor.execute('select id, hours, minutes, open from entries WHERE date >= '
+                         + time_now.strftime("%Y-%m-%d") + ' AND done = 0 ORDER BY date, hours, minutes')
 
     for entry in cur.fetchall():
         hours = entry[1]
