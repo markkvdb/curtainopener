@@ -1,20 +1,19 @@
-from time import sleep
 import RPi.GPIO as GPIO
 
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.OUT)    # Step
+GPIO.setup(4, GPIO.OUT)     # Direction True = CCW, Fale = CW
+GPIO.setup(22, GPIO.OUT)    # Enable controller
 
-def motor_controller(to_open):
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(17, GPIO.OUT)
-    GPIO.setup(4, GPIO.OUT)
+bool openclose = True
 
-    p = GPIO.PWM(17, 5)
-    p.start(0.1)
+GPIO.output(22, True)       # Enable the stepper controller
+GPIO.output(4, openclose)   # Set Direction
+p = GPIO.PWM(17, 520)       # Setup PWM
+p.start(0.1)                # Make steps
 
-    try:
-        sleep(100)
-    except KeyboardInterrupt:
-        print('Motor is interrupted.')
-        pass
+# Stop after some time
 
-    p.stop()
-    GPIO.cleanup()
+output_22 = False   # Turn off stepper contoller
+p.stop()
+GPIO.cleanup()
